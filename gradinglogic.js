@@ -1,10 +1,6 @@
-// The external modules that must be imported by the html page sourcing this file
-//const Bokeh = window.Bokeh;
-//const XLSX = window.XLSX;
-
 // The global variables
 var averageMarks = 50;
-var courseTitle = "BITS F111 Thermodynamics";
+var courseTitle = "BITS F123 XYZ";
 var highestMarks = 0;
 var lowestMarks = 999;
 var maxMarks = 100;
@@ -16,28 +12,47 @@ var counts = { "A": 0, "A-": 0, "B": 0, "B-": 0, "C": 0, "C-": 0, "D": 0, "E": 0
 var histData = { top: [], left: [], right: [], binValue: [] };
 var bokehHistCDS = new Bokeh.ColumnDataSource({ data: histData });
 
+// Make the axis ranges
+var xdr = new Bokeh.Range1d({ start: -0.5, end: maxMarks + 1 });
+var ydr = new Bokeh.Range1d({ start: 0.0, end: 10 });
+
 // Make the figure
-var plot = Bokeh.Plotting.figure({
+var plot = new Bokeh.Plot({
     sizing_mode: "scale_both",
-    tools: "save",
-    x_range: [-0.5, maxMarks + 1],
-    y_range: [0, 10],
-    x_axis_label: "Score",
-    y_axis_label: "Frequency",
-    max_width: 1000,
-    max_height: 300,
-    aspect_ratio: 2
+    x_range: xdr,
+    y_range: ydr,
+    height: 170,
+    background_fill_color: "#F2F2F7",
+    background_fill_alpha: 0.5
 });
 
 // Add hover tool to the plot
 var hovertool = new Bokeh.HoverTool({ tooltips: [["Score", "@binValue"], ["Count", "@top"]] });
-plot.add_tools(hovertool)
+var savetool = new Bokeh.SaveTool();
+plot.add_tools(hovertool);
+plot.add_tools(savetool);
 
 //Give a title to the plot
-plot.title.text = courseTitle;
+var plotTitle = new Bokeh.Title({ text: `${courseTitle} MGPA: 0.0`, align: "center", text_font_size: "24pt" });
+plot.add_layout(plotTitle, "above");
+
+// Set the axis labels
+var xticker = new Bokeh.SingleIntervalTicker({interval:5, num_minor_ticks:10});
+var xaxis = new Bokeh.LinearAxis({ axis_label: "Score", axis_label_text_font_size: "20pt", major_label_text_font_size: "16pt", ticker: xticker });
+plot.add_layout(xaxis, "left");
+var yaxis = new Bokeh.LinearAxis({ axis_label: "Frequency", axis_label_text_font_size: "20pt", major_label_text_font_size: "16pt" });
+plot.add_layout(yaxis, "below");
+
+// add grids to the plot
+var xgrid = new Bokeh.Grid({ ticker: xaxis.ticker, dimension: 0, grid_line_color: '#d8dcd6' });
+var ygrid = new Bokeh.Grid({ ticker: yaxis.ticker, dimension: 1, grid_line_color: '#d8dcd6' });
+plot.add_layout(xgrid);
+plot.add_layout(ygrid);
+
 
 // make the histogram
-plot.quad({ field: "left" }, { field: "right" }, { field: "top" }, 0, { source: bokehHistCDS });
+var quad = new Bokeh.Quad({ left: { "field": "left" }, right: { "field": "right" }, top: { "field": "top" }, bottom: 0, line_color: 'black', fill_color: "#b5485d", line_alpha: 0.5, fill_alpha: 0.5 });
+plot.add_glyph(quad, bokehHistCDS);
 
 // The average marker
 averageMarker = new Bokeh.Span({
@@ -53,77 +68,87 @@ plot.add_layout(averageMarker);
 aSpan = new Bokeh.Span({
     location: Math.round(0.8 * maxMarks),
     dimension: "height",
-    line_color: "green",
+    line_color: "#410200",
     line_width: 3
 });
 plot.add_layout(aSpan);
 amSpan = new Bokeh.Span({
     location: Math.round(0.7 * maxMarks),
     dimension: "height",
-    line_color: "green",
+    line_color: "#410200",
     line_width: 3
 });
 plot.add_layout(amSpan);
 bSpan = new Bokeh.Span({
     location: Math.round(0.6 * maxMarks),
     dimension: "height",
-    line_color: "green",
+    line_color: "#410200",
     line_width: 3
 });
 plot.add_layout(bSpan);
 bmSpan = new Bokeh.Span({
     location: Math.round(0.5 * maxMarks),
     dimension: "height",
-    line_color: "green",
+    line_color: "#410200",
     line_width: 3
 });
 plot.add_layout(bmSpan);
 cSpan = new Bokeh.Span({
     location: Math.round(0.4 * maxMarks),
     dimension: "height",
-    line_color: "green",
+    line_color: "#410200",
     line_width: 3
 });
 plot.add_layout(cSpan);
 cmSpan = new Bokeh.Span({
     location: Math.round(0.3 * maxMarks),
     dimension: "height",
-    line_color: "green",
+    line_color: "#410200",
     line_width: 3
 });
 plot.add_layout(cmSpan);
 dSpan = new Bokeh.Span({
     location: Math.round(0.2 * maxMarks),
     dimension: "height",
-    line_color: "green",
+    line_color: "#410200",
     line_width: 3
 });
 plot.add_layout(dSpan);
 eSpan = new Bokeh.Span({
     location: Math.round(0.1 * maxMarks),
     dimension: "height",
-    line_color: "green",
+    line_color: "#410200",
     line_width: 3
 });
 plot.add_layout(eSpan);
 
 // Create a Label for each grade
-aLabel = new Bokeh.Label({ x: Math.round(0.8 * maxMarks), y: 9, text: "A: 0" });
+aLabel = new Bokeh.Label({ x: Math.round(0.8 * maxMarks), y: 9, text: "A: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat", background_fill_alpha: 0.5 });
 plot.add_layout(aLabel)
-amLabel = new Bokeh.Label({ x: Math.round(0.7 * maxMarks), y: 9, text: "A-: 0" });
+amLabel = new Bokeh.Label({ x: Math.round(0.7 * maxMarks), y: 9, text: "A-: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat", background_fill_alpha: 0.5  });
 plot.add_layout(amLabel)
-bLabel = new Bokeh.Label({ x: Math.round(0.6 * maxMarks), y: 9, text: "B: 0" });
+bLabel = new Bokeh.Label({ x: Math.round(0.6 * maxMarks), y: 9, text: "B: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat", background_fill_alpha: 0.5  });
 plot.add_layout(bLabel)
-bmLabel = new Bokeh.Label({ x: Math.round(0.5 * maxMarks), y: 9, text: "B-: 0" });
+bmLabel = new Bokeh.Label({ x: Math.round(0.5 * maxMarks), y: 9, text: "B-: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat", background_fill_alpha: 0.5  });
 plot.add_layout(bmLabel)
-cLabel = new Bokeh.Label({ x: Math.round(0.4 * maxMarks), y: 9, text: "C: 0" });
+cLabel = new Bokeh.Label({ x: Math.round(0.4 * maxMarks), y: 9, text: "C: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat", background_fill_alpha: 0.5  });
 plot.add_layout(cLabel)
-cmLabel = new Bokeh.Label({ x: Math.round(0.3 * maxMarks), y: 9, text: "C-: 0" });
+cmLabel = new Bokeh.Label({ x: Math.round(0.3 * maxMarks), y: 9, text: "C-: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat", background_fill_alpha: 0.5  });
 plot.add_layout(cmLabel)
-dLabel = new Bokeh.Label({ x: Math.round(0.2 * maxMarks), y: 9, text: "D: 0" });
+dLabel = new Bokeh.Label({ x: Math.round(0.2 * maxMarks), y: 9, text: "D: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat", background_fill_alpha: 0.5  });
 plot.add_layout(dLabel)
-eLabel = new Bokeh.Label({ x: Math.round(0.1 * maxMarks), y: 9, text: "E: 0" });
+eLabel = new Bokeh.Label({ x: Math.round(0.1 * maxMarks), y: 9, text: "E: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat", background_fill_alpha: 0.5  });
 plot.add_layout(eLabel)
+
+// Initially only the main grades should be shown
+amSpan.visible = false;
+bmSpan.visible = false;
+cmSpan.visible = false;
+eSpan.visible = false;
+amLabel.visible = false;
+bmLabel.visible = false;
+cmLabel.visible = false;
+eLabel.visible = false;
 
 // Show the plot
 Bokeh.Plotting.show(plot);
@@ -137,6 +162,7 @@ var gradesData = {
         Weight: 10,
         CutOff: Math.round(0.8 * maxMarks),
         Slider: "aSlider",
+        SliderVal: "aSliderVal",
         Span: aSpan,
         Label: aLabel
     },
@@ -145,6 +171,7 @@ var gradesData = {
         Weight: 9,
         CutOff: Math.round(0.7 * maxMarks),
         Slider: "amSlider",
+        SliderVal: "amSliderVal",
         Span: amSpan,
         Label: amLabel
     },
@@ -153,6 +180,7 @@ var gradesData = {
         Weight: 8,
         CutOff: Math.round(0.6 * maxMarks),
         Slider: "bSlider",
+        SliderVal: "bSliderVal",
         Span: bSpan,
         Label: bLabel
     },
@@ -161,6 +189,7 @@ var gradesData = {
         Weight: 7,
         CutOff: Math.round(0.5 * maxMarks),
         Slider: "bmSlider",
+        SliderVal: "bmSliderVal",
         Span: bmSpan,
         Label: bmLabel
     },
@@ -169,6 +198,7 @@ var gradesData = {
         Weight: 6,
         CutOff: Math.round(0.4 * maxMarks),
         Slider: "cSlider",
+        SliderVal: "cSliderVal",
         Span: cSpan,
         Label: cLabel
     },
@@ -177,6 +207,7 @@ var gradesData = {
         Weight: 5,
         CutOff: Math.round(0.3 * maxMarks),
         Slider: "cmSlider",
+        SliderVal: "cmSliderVal",
         Span: cmSpan,
         Label: cmLabel
     },
@@ -185,6 +216,7 @@ var gradesData = {
         Weight: 4,
         CutOff: Math.round(0.2 * maxMarks),
         Slider: "dSlider",
+        SliderVal: "dSliderVal",
         Span: dSpan,
         Label: dLabel
     },
@@ -193,87 +225,61 @@ var gradesData = {
         Weight: 2,
         CutOff: Math.round(0.1 * maxMarks),
         Slider: "eSlider",
+        SliderVal: "eSliderVal",
         Span: eSpan,
         Label: eLabel
     },
 };
 
 
-function UploadExcel() {
-    //
+function LoadData() {
+    // Load Data from the TextArea
     var textAreaData = document.getElementById("copyPasteData").value;
-    //alert(textAreaData)
-    document.getElementById("output").innerHTML = textAreaData;
-
-    //Reference the FileUpload element.
-    var fileUpload = document.getElementById("fileUpload");
-
-    //Validate whether File is valid Excel file.
-    var regex = /^([a-zA-Z0-9\s_\\.\-:\(\)])+(.xls|.xlsx)$/;
-    if (regex.test(fileUpload.value.toLowerCase())) {
-        if (typeof (FileReader) != "undefined") {
-            var reader = new FileReader();
-            //For Browsers other than IE.
-            if (reader.readAsBinaryString) {
-                reader.onload = function (e) {
-                    GetMarksFromExcelFile(e.target.result);
-                };
-                reader.readAsBinaryString(fileUpload.files[0]);
-            } else {
-                //For IE Browser.
-                reader.onload = function (e) {
-                    var data = "";
-                    var bytes = new Uint8Array(e.target.result);
-                    for (var i = 0; i < bytes.byteLength; i++) {
-                        data += String.fromCharCode(bytes[i]);
-                    }
-                    GetMarksFromExcelFile(data);
-                };
-                reader.readAsArrayBuffer(fileUpload.files[0]);
-            }
-        } else {
-            alert("This browser does not support HTML5.");
-        }
-    } else {
-        alert("Please upload a valid Excel file.");
+    // Replace all the tabs and spaces in the string with comma
+    var cleanedString = textAreaData.trim().replace(/[\s\n]+/g, ",");
+    // Parse the numbers from the string
+    var marksArray = cleanedString.split(",").map(parseFloat).filter(isFinite);
+    if (marksArray.length == 0) {
+        alert("Please enter marks data!");
+        return false;
     }
-};
-
-function GetMarksFromExcelFile(data) {
-    //Read the Excel File data in binary
-    var workbook = XLSX.read(data, {
-        type: 'binary'
-    });
-
-    //get the name of First Sheet.
-    var Sheet = workbook.SheetNames[0];
-
-    //Read all rows from First Sheet into an JSON array.
-    var excelRows = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[Sheet]);
-
-    //Add the data rows from Excel file.
+    // Reset the studentMarks array
+    studentMarks = [];
+    // Reset some variables
     var average = 0.0;
-    for (let i = 0; i < excelRows.length; i++) {
+    var highest = -1;
+    var lowest = 999;
+    for (let i = 0; i < marksArray.length; i++) {
         //Populate the global array
-        let marks = excelRows[i].Total;
+        let marks = marksArray[i];
         studentMarks[i] = marks;
-        if (marks > highestMarks) {
-            highestMarks = marks;
+        if (marks > highest) {
+            highest = marks;
         }
-        if (marks < lowestMarks) {
-            lowestMarks = marks;
+        if (marks < lowest) {
+            lowest = marks;
         }
         average = average + marks;
     }
-    // Update the total number of students
-    totalStudents = excelRows.length;
+    average = Math.round(average / marksArray.length);
 
-    // Update the course average
-    average = Math.round(average / excelRows.length);
+    // Update the global variables
+    totalStudents = marksArray.length;
     averageMarks = average;
+    highestMarks = highest;
+    lowestMarks = lowest;
+    // Show some message to the user
+    document.getElementById("output").innerHTML = `Number of marks = ${totalStudents}, Average = ${averageMarks}.`;
+    return true;
 };
 
 function PlotHistogram() {
+    // First get the data
+    var success = LoadData();
+    if (!success) {
+        return;
+    }
+
     // Read the data from input fields
     courseTitle = document.getElementById("courseTitleInput").value;
     maxMarks = parseInt(document.getElementById("courseTotalInput").value);
@@ -308,19 +314,19 @@ function PlotHistogram() {
 
     // Update the label locations
     var ymax = Math.max(...histogram);
-    aLabel.y = ymax - 1;
-    amLabel.y = ymax - 1;
-    bLabel.y = ymax - 1;
-    bmLabel.y = ymax - 1;
-    cLabel.y = ymax - 1;
-    cmLabel.y = ymax - 1;
-    dLabel.y = ymax - 1;
-    eLabel.y = ymax - 1;
+    aLabel.y = ymax + 1;
+    amLabel.y = ymax + 1;
+    bLabel.y = ymax + 1;
+    bmLabel.y = ymax + 1;
+    cLabel.y = ymax + 1;
+    cmLabel.y = ymax + 1;
+    dLabel.y = ymax + 1;
+    eLabel.y = ymax + 1;
 
     // Update plot ranges, title and the average marker
-    plot.title.text = "${courseTitle} MGPA: 0.0"
-    plot.x_range.end = maxMarks + 1;
-    plot.y_range.end = ymax + 3;
+    plotTitle.text = "${courseTitle} MGPA: 0.0"
+    xdr.end = maxMarks + 1;
+    ydr.end = ymax + 3;
     averageMarker.location = averageMarks;
 
     // Update the slider limits
@@ -332,9 +338,6 @@ function PlotHistogram() {
     document.getElementById("cmSlider").max = maxMarks;
     document.getElementById("dSlider").max = maxMarks;
     document.getElementById("eSlider").max = maxMarks;
-
-    // Update the course title
-    plot.title.text = courseTitle;
 
     // Update the column data source
     bokehHistCDS.data = histData;
@@ -411,6 +414,7 @@ function updatePlot() {
             // Enable the slider
             document.getElementById(data.Slider).disabled = false;
             document.getElementById(data.Slider).value = data.CutOff;
+            document.getElementById(data.SliderVal).innerHTML = data.CutOff;
         }
         else {
             // Turn off the disabled grades
@@ -421,7 +425,7 @@ function updatePlot() {
         }
     }
     // Set the MGPA in the title
-    plot.title.text = `${courseTitle} MGPA: ${mgpa.toFixed(2)}`;
+    plotTitle.text = `${courseTitle} MGPA: ${mgpa.toFixed(2)}`;
 };
 
 function calculateMgpa() {
