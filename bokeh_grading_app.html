@@ -8,26 +8,23 @@
       src="https://cdn.bokeh.org/bokeh/release/bokeh-2.3.2.min.js"
       crossorigin="anonymous"
     ></script>
-    <script
-      type="text/javascript"
-      src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.3.2.min.js"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      type="text/javascript"
-      src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.3.2.min.js"
-      crossorigin="anonymous"
-    ></script>
-    <script type="text/javascript" src="gradinglogic.js"></script>
+    <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.3.2.min.js" crossorigin="anonymous" ></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/amit112amit/browser-grading@1.1.0/gradinglogic.min.js" ></script>
   </head>
 
   <body style="width: 90%">
     <h3>Interactive Grading</h3>
-    <p>
-      Enter a comma-separated, tab-separated, space-separated or
-      newline-separated list of marks. For example, copy a column or a row
-      from an Excel sheet and paste it in the text area.
-    </p>
+    <ol>
+      <li>
+        Enter a comma-separated, tab-separated, space-separated or
+        newline-separated list of marks. For example, copy a column or a row
+        from an Excel sheet and paste it in the text area.
+      </li>
+      <li>For fine-grained control on the sliders, click a slider and then use keyboard arrow keys.</li>
+      <li>
+        To download the plot, click on the save button on the right of the plot.
+      </li>
+    </ol>
     <div class="container" style="display: flex">
       <div class="fixed" style="width: 500px">
         <form>
@@ -78,11 +75,11 @@
         />
       </div>
     </div>
-    <div id="output" style="color: red;"></div>
+    <div id="output" style="color: red"></div>
     <!-- Create a tabular layout for the grade labels, checkboxes, and sliders -->
-    <form>
+    <form autocomplete="off">
       <fieldset style="width: 1150px">
-        <legend style="margin-left: 450px;">Adjust grade-cutoffs</legend>
+        <legend style="margin-left: 450px">Adjust grade-cutoffs</legend>
         <div class="divTable" style="display: table; width: auto">
           <div
             class="divRow"
