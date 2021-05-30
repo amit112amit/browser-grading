@@ -37,11 +37,11 @@ var plotTitle = new Bokeh.Title({ text: `${courseTitle} MGPA: 0.0`, align: "cent
 plot.add_layout(plotTitle, "above");
 
 // Set the axis labels
-var xticker = new Bokeh.SingleIntervalTicker({interval:5, num_minor_ticks:10});
-var xaxis = new Bokeh.LinearAxis({ axis_label: "Score", axis_label_text_font_size: "20pt", major_label_text_font_size: "16pt", ticker: xticker });
-plot.add_layout(xaxis, "left");
+var xaxis = new Bokeh.LinearAxis({ axis_label: "Score", axis_label_text_font_size: "20pt", major_label_text_font_size: "16pt" });
 var yaxis = new Bokeh.LinearAxis({ axis_label: "Frequency", axis_label_text_font_size: "20pt", major_label_text_font_size: "16pt" });
-plot.add_layout(yaxis, "below");
+xaxis.ticker.desired_num_ticks = 20;
+plot.add_layout(xaxis, "below");
+plot.add_layout(yaxis, "left");
 
 // add grids to the plot
 var xgrid = new Bokeh.Grid({ ticker: xaxis.ticker, dimension: 0, grid_line_color: '#d8dcd6' });
@@ -250,8 +250,8 @@ function LoadData() {
     var highest = -1;
     var lowest = 999;
     for (let i = 0; i < marksArray.length; i++) {
-        //Populate the global array
-        let marks = marksArray[i];
+        //Populate the global array with rounded marks
+        let marks = Math.round(marksArray[i]);
         studentMarks[i] = marks;
         if (marks > highest) {
             highest = marks;
@@ -269,7 +269,7 @@ function LoadData() {
     highestMarks = highest;
     lowestMarks = lowest;
     // Show some message to the user
-    document.getElementById("output").innerHTML = `Number of marks = ${totalStudents}, Average = ${averageMarks}.`;
+    document.getElementById("output").innerHTML = `Number of marks = ${totalStudents}, Average = ${averageMarks}, Highest = ${highestMarks}, Lowest = ${lowestMarks}.`;
     return true;
 };
 
@@ -449,7 +449,7 @@ function calculateMgpa() {
         // Contribution to the MGPA
         mgpa = mgpa + count * data.Weight;
         // update the upperlimit for the lower grade
-        upperLimit = lowerLimit - 1;
+        upperLimit = lowerLimit;
     }
     // Normalize the MGPA
     mgpa = mgpa / totalStudents;
