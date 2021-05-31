@@ -3,13 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <title>Interactive Grading</title>
-    <script
-      type="text/javascript"
-      src="https://cdn.bokeh.org/bokeh/release/bokeh-2.3.2.min.js"
-      crossorigin="anonymous"
-    ></script>
+    <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-2.3.2.min.js" crossorigin="anonymous" ></script>
     <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.3.2.min.js" crossorigin="anonymous" ></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/amit112amit/browser-grading@1.1.0/gradinglogic.min.js" ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js" integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/" crossorigin="anonymous"></script>
+    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/amit112amit/browser-grading@1.1.0/gradinglogic.min.js" ></script> -->
+    <script type="text/javascript" src="gradinglogic.js" ></script>
   </head>
 
   <body style="width: 90%">
@@ -21,9 +19,7 @@
         from an Excel sheet and paste it in the text area.
       </li>
       <li>For fine-grained control on the sliders, click a slider and then use keyboard arrow keys.</li>
-      <li>
-        To download the plot, click on the save button on the right of the plot.
-      </li>
+      <li>To adjust the axis limits, use the Pan tool or the Box Zoom tool from the toolbar on the right top of the plot. After activating the tool, click and drag on the plot area. To reset the axes, click on the Reset tool.</li>
     </ol>
     <div class="container" style="display: flex">
       <div class="fixed" style="width: 500px">
@@ -67,12 +63,24 @@
         </form>
       </div>
       <div class="fixed" style="width: 100px">
-        <input
-          type="button"
-          id="plotHist"
-          value="Plot Histogram"
-          onclick="PlotHistogram()"
-        />
+        <form>
+          <p>
+          <input
+            type="button"
+            id="plotHistButton"
+            value="Plot Histogram"
+            onclick="PlotHistogram()"
+          />
+        </p>
+        <p>
+          <input
+            type="button"
+            id="savePDFButton"
+            value="Download PDF"
+            onclick="savePDF()"
+          />
+        </p>
+        </form>
       </div>
     </div>
     <div id="output" style="color: red"></div>
@@ -267,4 +275,5 @@
       </fieldset>
     </form>
   </body>
+  <div class="bk-root" id="plotDiv"></div>
 </html>

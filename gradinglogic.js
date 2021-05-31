@@ -1,4 +1,4 @@
-// The global variables
+// The global constiables
 var averageMarks = 50;
 var courseTitle = "BITS F123 XYZ";
 var highestMarks = 0;
@@ -8,50 +8,51 @@ var mgpa = 0.0;
 var totalStudents = 100;
 
 var studentMarks = [];
-var counts = { "A": 0, "A-": 0, "B": 0, "B-": 0, "C": 0, "C-": 0, "D": 0, "E": 0 };
-var histData = { top: [], left: [], right: [], binValue: [] };
-var bokehHistCDS = new Bokeh.ColumnDataSource({ data: histData });
+const counts = { "A": 0, "A-": 0, "B": 0, "B-": 0, "C": 0, "C-": 0, "D": 0, "E": 0 };
+const histData = { top: [], left: [], right: [], binValue: [] };
+const bokehHistCDS = new Bokeh.ColumnDataSource({ data: histData });
 
 // Make the axis ranges
-var xdr = new Bokeh.Range1d({ start: -0.5, end: maxMarks + 1 });
-var ydr = new Bokeh.Range1d({ start: 0.0, end: 10 });
+const xdr = new Bokeh.Range1d({ start: -0.5, end: maxMarks + 1 });
+const ydr = new Bokeh.Range1d({ start: 0.0, end: 10 });
 
 // Make the figure
-var plot = new Bokeh.Plot({
+const plot = new Bokeh.Plot({
     sizing_mode: "scale_both",
     x_range: xdr,
     y_range: ydr,
     height: 170,
-    background_fill_color: "#F2F2F7",
-    background_fill_alpha: 0.5
+    background_fill_color: "#F2F2F7"
 });
 
 // Add hover tool to the plot
-var hovertool = new Bokeh.HoverTool({ tooltips: [["Score", "@binValue"], ["Count", "@top"]] });
-var savetool = new Bokeh.SaveTool();
+const hovertool = new Bokeh.HoverTool({ tooltips: [["Score", "@binValue"], ["Count", "@top"]] });
 plot.add_tools(hovertool);
-plot.add_tools(savetool);
+plot.add_tools(new Bokeh.SaveTool());
+//plot.add_tools(new Bokeh.BoxZoomTool());
+//plot.add_tools(new Bokeh.PanTool({dimensions: "width"}));
+//plot.add_tools(new Bokeh.ResetTool());
+plot.toolbar_location = "above";
 
 //Give a title to the plot
-var plotTitle = new Bokeh.Title({ text: `${courseTitle} MGPA: 0.0`, align: "center", text_font_size: "24pt" });
+const plotTitle = new Bokeh.Title({ text: `${courseTitle} MGPA: 0.0`, align: "center", text_font_size: "24pt" });
 plot.add_layout(plotTitle, "above");
 
 // Set the axis labels
-var xaxis = new Bokeh.LinearAxis({ axis_label: "Score", axis_label_text_font_size: "20pt", major_label_text_font_size: "16pt" });
-var yaxis = new Bokeh.LinearAxis({ axis_label: "Frequency", axis_label_text_font_size: "20pt", major_label_text_font_size: "16pt" });
+const xaxis = new Bokeh.LinearAxis({ axis_label: "Score", axis_label_text_font_size: "20pt", major_label_text_font_size: "16pt" });
+const yaxis = new Bokeh.LinearAxis({ axis_label: "Frequency", axis_label_text_font_size: "20pt", major_label_text_font_size: "16pt" });
 xaxis.ticker.desired_num_ticks = 20;
 plot.add_layout(xaxis, "below");
 plot.add_layout(yaxis, "left");
 
-// add grids to the plot
-var xgrid = new Bokeh.Grid({ ticker: xaxis.ticker, dimension: 0, grid_line_color: '#d8dcd6' });
-var ygrid = new Bokeh.Grid({ ticker: yaxis.ticker, dimension: 1, grid_line_color: '#d8dcd6' });
+// Add grids to the plot
+const xgrid = new Bokeh.Grid({ ticker: xaxis.ticker, dimension: 0, grid_line_color: '#d8dcd6' });
+const ygrid = new Bokeh.Grid({ ticker: yaxis.ticker, dimension: 1, grid_line_color: '#d8dcd6' });
 plot.add_layout(xgrid);
 plot.add_layout(ygrid);
 
-
-// make the histogram
-var quad = new Bokeh.Quad({ left: { "field": "left" }, right: { "field": "right" }, top: { "field": "top" }, bottom: 0, line_color: 'black', fill_color: "#b5485d", line_alpha: 0.5, fill_alpha: 0.5 });
+// Make the histogram
+const quad = new Bokeh.Quad({ left: { "field": "left" }, right: { "field": "right" }, top: { "field": "top" }, bottom: 0, line_color: 'black', fill_color: "#c0737a"});
 plot.add_glyph(quad, bokehHistCDS);
 
 // The average marker
@@ -123,21 +124,23 @@ eSpan = new Bokeh.Span({
 plot.add_layout(eSpan);
 
 // Create a Label for each grade
-aLabel = new Bokeh.Label({ x: Math.round(0.8 * maxMarks), y: 9, text: "A: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat", background_fill_alpha: 0.5 });
+avgLabel = new Bokeh.Label({ x: averageMarks, y: 9, text: `Avg: ${averageMarks}`, text_font_size: "18pt", text_color: "red", border_line_color: "red"});
+plot.add_layout(avgLabel)
+aLabel = new Bokeh.Label({ x: Math.round(0.8 * maxMarks), y: 9, text: "A: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat"});
 plot.add_layout(aLabel)
-amLabel = new Bokeh.Label({ x: Math.round(0.7 * maxMarks), y: 9, text: "A-: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat", background_fill_alpha: 0.5  });
+amLabel = new Bokeh.Label({ x: Math.round(0.7 * maxMarks), y: 9, text: "A-: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat"});
 plot.add_layout(amLabel)
-bLabel = new Bokeh.Label({ x: Math.round(0.6 * maxMarks), y: 9, text: "B: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat", background_fill_alpha: 0.5  });
+bLabel = new Bokeh.Label({ x: Math.round(0.6 * maxMarks), y: 9, text: "B: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat"});
 plot.add_layout(bLabel)
-bmLabel = new Bokeh.Label({ x: Math.round(0.5 * maxMarks), y: 9, text: "B-: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat", background_fill_alpha: 0.5  });
+bmLabel = new Bokeh.Label({ x: Math.round(0.5 * maxMarks), y: 9, text: "B-: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat"});
 plot.add_layout(bmLabel)
-cLabel = new Bokeh.Label({ x: Math.round(0.4 * maxMarks), y: 9, text: "C: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat", background_fill_alpha: 0.5  });
+cLabel = new Bokeh.Label({ x: Math.round(0.4 * maxMarks), y: 9, text: "C: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat"});
 plot.add_layout(cLabel)
-cmLabel = new Bokeh.Label({ x: Math.round(0.3 * maxMarks), y: 9, text: "C-: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat", background_fill_alpha: 0.5  });
+cmLabel = new Bokeh.Label({ x: Math.round(0.3 * maxMarks), y: 9, text: "C-: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat"});
 plot.add_layout(cmLabel)
-dLabel = new Bokeh.Label({ x: Math.round(0.2 * maxMarks), y: 9, text: "D: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat", background_fill_alpha: 0.5  });
+dLabel = new Bokeh.Label({ x: Math.round(0.2 * maxMarks), y: 9, text: "D: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat"});
 plot.add_layout(dLabel)
-eLabel = new Bokeh.Label({ x: Math.round(0.1 * maxMarks), y: 9, text: "E: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat", background_fill_alpha: 0.5  });
+eLabel = new Bokeh.Label({ x: Math.round(0.1 * maxMarks), y: 9, text: "E: 0", text_font_size: "18pt", border_line_color: "black", background_fill_color: "wheat"});
 plot.add_layout(eLabel)
 
 // Initially only the main grades should be shown
@@ -151,12 +154,18 @@ cmLabel.visible = false;
 eLabel.visible = false;
 
 // Show the plot
-Bokeh.Plotting.show(plot);
+//Bokeh.Plotting.show(plot);
+const doc = new Bokeh.Document();
+doc.add_root(plot);
 
+window.onload = function() {
+    var theDiv = document.getElementById("plotDiv");
+    Bokeh.embed.add_document_standalone(doc, theDiv);
+}
 
 // The following data-structure stores the state of the app -- which grades are
 // enabled, what are their cutoffs and counts.
-var gradesData = {
+const gradesData = {
     "A": {
         Enabled: true,
         Weight: 10,
@@ -234,18 +243,18 @@ var gradesData = {
 
 function LoadData() {
     // Load Data from the TextArea
-    var textAreaData = document.getElementById("copyPasteData").value;
+    const textAreaData = document.getElementById("copyPasteData").value;
     // Replace all the tabs and spaces in the string with comma
-    var cleanedString = textAreaData.trim().replace(/[\s\n]+/g, ",");
+    const cleanedString = textAreaData.trim().replace(/[\s\n]+/g, ",");
     // Parse the numbers from the string
-    var marksArray = cleanedString.split(",").map(parseFloat).filter(isFinite);
+    const marksArray = cleanedString.split(",").map(parseFloat).filter(isFinite);
     if (marksArray.length == 0) {
         alert("Please enter marks data!");
         return false;
     }
     // Reset the studentMarks array
     studentMarks = [];
-    // Reset some variables
+    // Reset some constiables
     var average = 0.0;
     var highest = -1;
     var lowest = 999;
@@ -263,7 +272,7 @@ function LoadData() {
     }
     average = Math.round(average / marksArray.length);
 
-    // Update the global variables
+    // Update the global constiables
     totalStudents = marksArray.length;
     averageMarks = average;
     highestMarks = highest;
@@ -275,7 +284,7 @@ function LoadData() {
 
 function PlotHistogram() {
     // First get the data
-    var success = LoadData();
+    const success = LoadData();
     if (!success) {
         return;
     }
@@ -313,21 +322,24 @@ function PlotHistogram() {
     histData.binValue = binEdges.slice(0, -1).map(function (v) { return v + 0.5; });
 
     // Update the label locations
-    var ymax = Math.max(...histogram);
-    aLabel.y = ymax + 1;
+    const ymax = Math.max(...histogram);
+    aLabel.y = ymax + 2;
     amLabel.y = ymax + 1;
-    bLabel.y = ymax + 1;
+    bLabel.y = ymax + 2;
     bmLabel.y = ymax + 1;
-    cLabel.y = ymax + 1;
+    cLabel.y = ymax + 2;
     cmLabel.y = ymax + 1;
-    dLabel.y = ymax + 1;
+    dLabel.y = ymax + 2;
     eLabel.y = ymax + 1;
+    avgLabel.y = ymax + 3;
 
     // Update plot ranges, title and the average marker
-    plotTitle.text = "${courseTitle} MGPA: 0.0"
+    plotTitle.text = "${courseTitle} MGPA: 0.0";
+    avgLabel.text = `Avg: ${averageMarks}`;
     xdr.end = maxMarks + 1;
-    ydr.end = ymax + 3;
+    ydr.end = ymax + 4;
     averageMarker.location = averageMarks;
+    avgLabel.x = averageMarks;
 
     // Update the slider limits
     document.getElementById("aSlider").max = maxMarks;
@@ -355,7 +367,7 @@ function updateGradeCutoff(grade) {
     Make all other grades consistent with this new cut-off. Finally,
     update the plot.
     */
-    var cutoff = parseInt(document.getElementById(gradesData[grade].Slider).value);
+    const cutoff = parseInt(document.getElementById(gradesData[grade].Slider).value);
 
     // Set the cutoff value in the data structure
     gradesData[grade].CutOff = cutoff;
@@ -363,7 +375,7 @@ function updateGradeCutoff(grade) {
     // Check and update the cut-off values for the higher grades
     // We will take advantage of the alphabetical ordering of the grades
     // 'A' > 'A-' > 'B' > 'B-' > 'C' > 'C-' > 'D' > 'E'
-    var grades = ["A", "A-", "B", "B-", "C", "C-", "D", "E"];
+    const grades = ["A", "A-", "B", "B-", "C", "C-", "D", "E"];
 
     // First we will traverse the `gradesData` object in the usual
     // sequence.
@@ -401,7 +413,7 @@ function updatePlot() {
     // Update MGPA and the counts
     calculateMgpa();
     for (const grade in gradesData) {
-        var data = gradesData[grade];
+        const data = gradesData[grade];
         if (data.Enabled) {
             // Set the locations for the Span and the Label
             data.Span.location = data.CutOff - 0.5;
@@ -435,7 +447,7 @@ function calculateMgpa() {
     var upperLimit = maxMarks + 1;
     var lowerLimit = 0;
     for (const grade in gradesData) {
-        var data = gradesData[grade];
+        const data = gradesData[grade];
         if (!data.Enabled) {
             continue;
         }
@@ -444,7 +456,7 @@ function calculateMgpa() {
         for (let i = lowerLimit; i < upperLimit; i++) {
             count = count + histData.top[i];
         }
-        // Set the count in the global variable
+        // Set the count in the global constiable
         counts[grade] = count;
         // Contribution to the MGPA
         mgpa = mgpa + count * data.Weight;
@@ -456,8 +468,30 @@ function calculateMgpa() {
 };
 
 function enableDisableGrade(grade) {
-    var currvalue = gradesData[grade].Enabled;
+    const currvalue = gradesData[grade].Enabled;
     gradesData[grade].Enabled = !currvalue;
     updatePlot();
 };
 
+function savePDF(){
+    var canvas = document.getElementsByTagName("canvas")[0];
+    // Get the width and height from the image
+    const { width, height } = canvas.getBoundingClientRect();
+	//creates image
+	var canvasImg = canvas.toDataURL("image/jpeg", 1.0);
+	//creates PDF from img
+	var doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4", putOnlyUsedFonts:true });
+    // In Landscape mode, A4 paper has size 287 x 210 mm.
+    // Out of that we are using 10, 10 as margin on both sides.
+    // Now we need to rescale the height of the figure as pser aspect ratio
+    const outwidth = 277;
+    const outheight = Math.round( outwidth * height / width);
+    const leftmargin = 10;
+    const topmargin = Math.round(0.5 * (210 - 2*leftmargin - outheight));
+
+    // We need to vertically position the plot in the center of the page
+
+	doc.addImage(canvasImg, 'JPEG', leftmargin, topmargin, outwidth, outheight );
+	doc.save('histogram.pdf');
+
+};
