@@ -3,11 +3,27 @@
   <head>
     <meta charset="utf-8" />
     <title>Interactive Grading</title>
-    <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-2.3.2.min.js" crossorigin="anonymous" ></script>
-    <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.3.2.min.js" crossorigin="anonymous" ></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js" integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/" crossorigin="anonymous"></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.bokeh.org/bokeh/release/bokeh-2.3.2.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.3.2.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js"
+      integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/"
+      crossorigin="anonymous"
+    ></script>
     <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/amit112amit/browser-grading@1.1.0/gradinglogic.min.js" ></script> -->
-    <script type="text/javascript" src="gradinglogic.js" ></script>
+    <script
+      type="text/javascript"
+      src="gradinglogic.js"
+      defer="defer"
+    ></script>
   </head>
 
   <body style="width: 90%">
@@ -18,8 +34,16 @@
         newline-separated list of marks. For example, copy a column or a row
         from an Excel sheet and paste it in the text area.
       </li>
-      <li>For fine-grained control on the sliders, click a slider and then use keyboard arrow keys.</li>
-      <li>To adjust the axis limits, use the Pan tool or the Box Zoom tool from the toolbar on the right top of the plot. After activating the tool, click and drag on the plot area. To reset the axes, click on the Reset tool.</li>
+      <li>
+        For fine-grained control on the sliders, click a slider and then use
+        keyboard arrow keys.
+      </li>
+      <li>
+        To adjust the axis limits, use the Pan tool or the Box Zoom tool from
+        the toolbar on the right top of the plot. After activating the tool,
+        click and drag on the plot area. To reset the axes, click on the Reset
+        tool.
+      </li>
     </ol>
     <div class="container" style="display: flex">
       <div class="fixed" style="width: 500px">
@@ -65,21 +89,11 @@
       <div class="fixed" style="width: 100px">
         <form>
           <p>
-          <input
-            type="button"
-            id="plotHistButton"
-            value="Plot Histogram"
-            onclick="PlotHistogram()"
-          />
-        </p>
-        <p>
-          <input
-            type="button"
-            id="savePDFButton"
-            value="Download PDF"
-            onclick="savePDF()"
-          />
-        </p>
+            <input type="button" id="plotHistButton" value="Plot Histogram" />
+          </p>
+          <p>
+            <input type="button" id="savePDFButton" value="Download PDF" />
+          </p>
         </form>
       </div>
     </div>
@@ -101,7 +115,7 @@
                 id="aCheck"
                 name="aCheck"
                 checked="true"
-                onchange="enableDisableGrade('A')"
+                onclick="(function(){if(aCheck.checked){aSlider.disabled = false; aSpinner.disabled = false;}else{aSlider.disabled = true; aSpinner.disabled = true;}})();"
               />
               <input
                 type="range"
@@ -111,9 +125,18 @@
                 max="maxMarks"
                 step="1"
                 value="80"
-                onchange="updateGradeCutoff('A')"
+                oninput="(function(){aSpinner.value = aSlider.value;})();"
               />
-              <label id="aSliderVal">80</label>
+              <input
+                type="number"
+                id="aSpinner"
+                min="0"
+                max="maxMarks"
+                step="1"
+                value="80"
+                oninput="(function(){aSlider.value = aSpinner.value;})();"
+              />
+              <!-- <label id="aSliderVal">80</label> -->
             </div>
             <div class="divCell" style="display: table-cell; width: 280px">
               <!-- For B grade -->
@@ -123,7 +146,7 @@
                 id="bCheck"
                 name="bCheck"
                 checked="true"
-                onchange="enableDisableGrade('B')"
+                onclick="(function(){if(bCheck.checked){bSlider.disabled = false; bSpinner.disabled = false;}else{bSlider.disabled = true; bSpinner.disabled = true;}})();"
               />
               <input
                 type="range"
@@ -133,9 +156,18 @@
                 max="maxMarks"
                 step="1"
                 value="60"
-                onchange="updateGradeCutoff('B')"
+                oninput="(function(){bSpinner.value = bSlider.value;})();"
               />
-              <label id="bSliderVal">60</label>
+              <input
+                type="number"
+                id="bSpinner"
+                min="0"
+                max="maxMarks"
+                step="1"
+                value="60"
+                oninput="(function(){bSlider.value = bSpinner.value;})();"
+              />
+              <!-- <label id="bSliderVal">60</label> -->
             </div>
             <div class="divCell" style="display: table-cell; width: 280px">
               <!-- For C grade -->
@@ -145,7 +177,7 @@
                 id="cCheck"
                 name="cCheck"
                 checked="true"
-                onchange="enableDisableGrade('C')"
+                onclick="(function(){if(cCheck.checked){cSlider.disabled = false; cSpinner.disabled = false;}else{cSlider.disabled = true; cSpinner.disabled = true;}})();"
               />
               <input
                 type="range"
@@ -155,9 +187,18 @@
                 max="maxMarks"
                 step="1"
                 value="40"
-                onchange="updateGradeCutoff('C')"
+                oninput="(function(){cSpinner.value = cSlider.value;})();"
               />
-              <label id="cSliderVal">40</label>
+              <input
+                type="number"
+                id="cSpinner"
+                min="0"
+                max="maxMarks"
+                step="1"
+                value="40"
+                oninput="(function(){cSlider.value = cSpinner.value;})();"
+              />
+              <!-- <label id="cSliderVal">40</label> -->
             </div>
             <div class="divCell" style="display: table-cell; width: 280px">
               <!-- For D grade -->
@@ -167,7 +208,7 @@
                 id="dCheck"
                 name="dCheck"
                 checked="true"
-                onchange="enableDisableGrade('D')"
+                onclick="(function(){if(dCheck.checked){dSlider.disabled = false; dSpinner.disabled = false;}else{dSlider.disabled = true; dSpinner.disabled = true;}})();"
               />
               <input
                 type="range"
@@ -177,9 +218,18 @@
                 max="maxMarks"
                 step="1"
                 value="20"
-                onchange="updateGradeCutoff('D')"
+                oninput="(function(){dSpinner.value = dSlider.value;})();"
               />
-              <label id="dSliderVal">20</label>
+              <input
+                type="number"
+                id="dSpinner"
+                min="0"
+                max="maxMarks"
+                step="1"
+                value="20"
+                oninput="(function(){dSlider.value = dSpinner.value;})();"
+              />
+              <!-- <label id="dSliderVal">20</label> -->
             </div>
           </div>
           <div
@@ -193,7 +243,7 @@
                 type="checkbox"
                 id="amCheck"
                 name="amCheck"
-                onchange="enableDisableGrade('A-')"
+                onclick="(function(){if(amCheck.checked){amSlider.disabled = false; amSpinner.disabled = false;}else{amSlider.disabled = true; amSpinner.disabled = true;}})();"
               />
               <input
                 type="range"
@@ -203,9 +253,17 @@
                 max="maxMarks"
                 step="1"
                 value="70"
-                onchange="updateGradeCutoff('A-')"
+                oninput="(function(){amSpinner.value = amSlider.value;})();"
               />
-              <label id="amSliderVal">70</label>
+              <input
+                type="number"
+                id="amSpinner"
+                min="0"
+                max="maxMarks"
+                step="1"
+                value="70"
+                oninput="(function(){amSlider.value = amSpinner.value;})();"
+              />
             </div>
             <div class="divCell" style="display: table-cell; width: 280px">
               <!-- For B- grade -->
@@ -214,7 +272,7 @@
                 type="checkbox"
                 id="bmCheck"
                 name="bmCheck"
-                onchange="enableDisableGrade('B-')"
+                onclick="(function(){if(bmCheck.checked){bmSlider.disabled = false; bmSpinner.disabled = false;}else{bmSlider.disabled = true; bmSpinner.disabled = true;}})();"
               />
               <input
                 type="range"
@@ -224,9 +282,17 @@
                 max="maxMarks"
                 step="1"
                 value="50"
-                onchange="updateGradeCutoff('B-')"
+                oninput="(function(){bmSpinner.value = bmSlider.value;})();"
               />
-              <label id="bmSliderVal">50</label>
+              <input
+                type="number"
+                id="bmSpinner"
+                min="0"
+                max="maxMarks"
+                step="1"
+                value="50"
+                oninput="(function(){bmSlider.value = bmSpinner.value;})();"
+              />
             </div>
             <div class="divCell" style="display: table-cell; width: 280px">
               <!-- For C- grade -->
@@ -235,7 +301,7 @@
                 type="checkbox"
                 id="cmCheck"
                 name="cmCheck"
-                onchange="enableDisableGrade('C-')"
+                onclick="(function(){if(cmCheck.checked){cmSlider.disabled = false; cmSpinner.disabled = false;}else{cmSlider.disabled = true; cmSpinner.disabled = true;}})();"
               />
               <input
                 type="range"
@@ -245,9 +311,17 @@
                 max="maxMarks"
                 step="1"
                 value="30"
-                onchange="updateGradeCutoff('C-')"
+                oninput="(function(){cmSpinner.value = cmSlider.value;})();"
               />
-              <label id="cmSliderVal">30</label>
+              <input
+                type="number"
+                id="cmSpinner"
+                min="0"
+                max="maxMarks"
+                step="1"
+                value="30"
+                oninput="(function(){cmSlider.value = cmSpinner.value;})();"
+              />
             </div>
             <div class="divCell" style="display: table-cell; width: 280px">
               <!-- For E grade -->
@@ -256,7 +330,7 @@
                 type="checkbox"
                 id="eCheck"
                 name="eCheck"
-                onchange="enableDisableGrade('E')"
+                onclick="(function(){if(eCheck.checked){eSlider.disabled = false; eSpinner.disabled = false;}else{eSlider.disabled = true; eSpinner.disabled = true;}})();"
               />
               <input
                 type="range"
@@ -266,9 +340,17 @@
                 max="maxMarks"
                 step="1"
                 value="10"
-                onchange="updateGradeCutoff('E')"
+                oninput="(function(){eSpinner.value = eSlider.value;})();"
               />
-              <label id="eSliderVal">10</label>
+              <input
+                type="number"
+                id="eSpinner"
+                min="0"
+                max="maxMarks"
+                step="1"
+                value="10"
+                oninput="(function(){eSlider.value = eSpinner.value;})();"
+              />
             </div>
           </div>
         </div>
