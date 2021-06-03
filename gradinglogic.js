@@ -48,6 +48,9 @@ class Controller {
             }
             return;
         }
+        // Display the statistics
+        const statsTxt = `Number of Students: ${this.gradesData.numStudents} Highest: ${this.gradesData.highest} Lowest: ${this.gradesData.lowest} Average: ${this.gradesData.average}`
+        document.getElementById("output").innerHTML = statsTxt;
         // Otherwise proceed to create a plot
         this.gradesPlot = new GradesPlot(this.plotDivElement, this.gradesData, this.courseTitleInput.value);
         // Enable the slider controls
@@ -70,7 +73,7 @@ class Controller {
             var _this = this;
             this.checkboxes[i].addEventListener("click", function () { _this.updateGradeCutOffs(i); });
             this.sliders[i].addEventListener("input", function () { _this.updateGradeCutOffs(i) });
-            this.spinners[i].addEventListener("input", function () { _this.updateGradeCutOffs(i) });
+            this.spinners[i].addEventListener("change", function () { _this.updateGradeCutOffs(i) });
         }
         // Enable the save PDF button
         this.saveButton.disabled = false;
@@ -82,28 +85,98 @@ class Controller {
         this.gradesData.updateCutOff(index, this.checkboxes[index].checked, parseInt(this.sliders[index].value));
         // Update the plot
         this.gradesPlot.updateGradeLayouts(this.gradesData);
+        // Update the sliders based on the changes
+        for (let i = 0; i < this.gradePrefixes.length; i++) {
+            this.sliders[i].value = this.gradesData.gradesArray[i].cutOff;
+            this.spinners[i].value = this.gradesData.gradesArray[i].cutOff;
+        }
     }
 
     // To save PDF
-    savePDF() {
+    savePDF = () => {
         const canvas = document.getElementsByTagName("canvas")[0];
         // Get the width and height from the image
-        const { width, height } = canvas.getBoundingClientRect();
+        const domRect = canvas.getBoundingClientRect();
+        const imgWidth = domRect.width;
+        const imgHeight = domRect.height;
         //creates image
         //var canvasImg = canvas.toDataURL("image/jpeg", 1.0);
         var canvasImg = canvas.toDataURL("image/png");
         //creates PDF from img
         var doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4", putOnlyUsedFonts: true });
-        // In Landscape mode, A4 paper has size 287 x 210 mm.
-        // Out of that we are using 10, 10 as margin on both sides.
-        // Now we need to rescale the height of the figure as pser aspect ratio
-        const outwidth = 277;
-        const outheight = Math.round(outwidth * height / width);
-        const leftmargin = 10;
-        const topmargin = Math.round(0.5 * (210 - 2 * leftmargin - outheight));
+        // In Landscape mode, A4 paper has size 297 mm x 210 mm.
+        // Out of that we are using 10 mm as margin on both left and right sides.
+        // Now we need to rescale the height of the figure as per the aspect ratio
+        const scaledImgWidth = 277;
+        const scaledImgHeight = Math.round(scaledImgWidth * imgHeight / imgWidth);
+        const leftMargin = 10;
+        //const topmargin = Math.round(0.5 * (210 - 2 * leftmargin - outheight));
+        const topMargin = 15;
+
+        // Set the y-coordinate for next PDF element.
+        var yWrite = topMargin;
 
         // We need to vertically position the plot in the center of the page
-        doc.addImage(canvasImg, 'JPEG', leftmargin, topmargin, outwidth, outheight);
+        doc.addImage(canvasImg, 'JPEG', leftMargin, yWrite, scaledImgWidth, scaledImgHeight);
+
+        // Update the y position
+        yWrite = yWrite + scaledImgHeight + 20;
+
+        // Create a tabular data for printing to the PDF
+        const tableBody = [];
+        var upperLimit = this.gradesData.maxScore;
+        for (let i = 0; i < this.gradePrefixes.length; i++) {
+            const gradeArray = this.gradesData.gradesArray[i];
+            var tableRow = [];
+            if (!gradeArray.enabled)
+                tableRow = [{ content: gradeArray.label, styles: { halign: "center" } },
+                { content: 0, styles: { halign: "right" } },
+                { content: 0, styles: { halign: "right" } },
+                { content: 0, styles: { halign: "right" } }];
+            else {
+                tableRow = [{ content: gradeArray.label, styles: { halign: "center" } },
+                { content: gradeArray.cutOff, styles: { halign: "right" } },
+                { content: upperLimit, styles: { halign: "right" } },
+                { content: gradeArray.count, styles: { halign: "right" } }];
+                upperLimit = gradeArray.cutOff - 1;
+            }
+            tableBody.push(tableRow);
+        }
+
+        // Add some text
+        doc.setFontSize(14);
+        doc.text("Grades Summary Table", Math.round(0.45 * scaledImgWidth), yWrite);
+        doc.setFontSize(12);
+        doc.setTextColor(100);
+
+        // Update the y position
+        yWrite = yWrite + 5;
+
+        // Add a table
+        doc.autoTable({
+            startY: yWrite,
+            head: [["Grade", "Lower Limit", "Upper Limit", "Count"]],
+            body: tableBody,
+            headStyles: {
+                fontStyle: "bold",
+                halign: "center",
+                fillColor: "#c0737a",
+                textColor: "#ffffff",
+                lineWidth: 0.25,
+                lineColor: 20,
+            },
+            bodyStyles: {
+                lineColor: 20,
+                lineWidth: 0.25,
+                fillColor: "#ffffff",
+            },
+            alternateRowStyles: {
+                fillColor: "#f2f2f7",
+            },
+            tableWidth: Math.round(0.3 * scaledImgWidth),
+            margin: { left: Math.round(0.4 * scaledImgWidth)}
+        });
+
         doc.save('histogram.pdf');
     }
 }
@@ -288,8 +361,8 @@ class GradesPlot {
             sizing_mode: "scale_both",
             x_range: xdr,
             y_range: ydr,
+            background_fill_color: "#F2F2F7",
             height: 170,
-            background_fill_color: "#F2F2F7"
         });
 
         // For easy referencing of the plot
@@ -311,13 +384,13 @@ class GradesPlot {
         this.plotTitle = new Bokeh.Title({
             text: `${title} MGPA: ${gradesData.mgpa}`,
             align: "center",
-            text_font_size: "24pt"
+            text_font_size: "3em"
         });
         plot.add_layout(this.plotTitle, "above");
 
         // Set the axis labels
-        const xaxis = new Bokeh.LinearAxis({ axis_label: "Score", axis_label_text_font_size: "20pt", major_label_text_font_size: "16pt" });
-        const yaxis = new Bokeh.LinearAxis({ axis_label: "Frequency", axis_label_text_font_size: "20pt", major_label_text_font_size: "16pt" });
+        const xaxis = new Bokeh.LinearAxis({ axis_label: "Score", axis_label_text_font_size: "2em", major_label_text_font_size: "12pt" });
+        const yaxis = new Bokeh.LinearAxis({ axis_label: "Frequency", axis_label_text_font_size: "2em", major_label_text_font_size: "12pt" });
         xaxis.ticker.desired_num_ticks = 20;
         plot.add_layout(xaxis, "below");
         plot.add_layout(yaxis, "left");
@@ -350,9 +423,9 @@ class GradesPlot {
                 x: gradesArray[i].cutOff - 0.5,
                 y: ymax - 2 - i % 2,
                 text: `${gradesArray[i].label}: ${gradesArray[i].count}`,
-                text_font_size: "18pt",
                 border_line_color: "black",
-                background_fill_color: "wheat"
+                background_fill_color: "wheat",
+                text_font_size: "16pt",
             });
             plot.add_layout(this.labels[i]);
             // Set the visibility of the spans and labels
@@ -375,7 +448,7 @@ class GradesPlot {
             x: gradesData.average,
             y: ymax - 1,
             text: `Avg: ${gradesData.average}`,
-            text_font_size: "18pt",
+            text_font_size: "16pt",
             text_color: "red",
             border_line_color: "red",
             background_fill_color: "wheat",
@@ -403,6 +476,7 @@ class GradesPlot {
         }
         // Update the MGPA
         this.plotTitle.text = `${this.courseTitle} MGPA: ${gradesData.mgpa}`;
+        this.plotTitle.align = "center";
     }
 }
 
