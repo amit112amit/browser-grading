@@ -20,17 +20,24 @@ class Controller {
             this.spinners[i].disabled = true;
         }
         // The output area for showing statistics
-        this.outputDiv = document.getElementById("output");
+        this.averageTd = document.getElementById("tdAverage");
+        this.highestTd = document.getElementById("tdHighest");
+        this.lowestTd = document.getElementById("tdLowest");
+        this.studentCountTd = document.getElementById("tdStudentCount");
         // The plotting div element
         this.plotDivElement = document.getElementById("plotDiv");
         // The plot button
         this.plotButton = document.getElementById("plotHistButton");
         // The download PDF button
-        this.saveButton = document.getElementById("savePDFButton");
-        this.saveButton.disabled = true;
-        this.saveButton.onclick = this.savePDF;
+        this.savePDFButton = document.getElementById("savePDFButton");
+        this.savePDFButton.disabled = true;
+        // The download grades button
+        this.saveGradesButton = document.getElementById("saveGradesButton");
+        this.saveGradesButton.disabled = true;
         // Assign callbacks to the buttons
+        this.savePDFButton.onclick = this.savePDF;
         this.plotButton.onclick = this.plotHistogram;
+        this.saveGradesButton.onclick = this.saveGrades;
     }
 
     // What should happen when the user clicks plot histogram
@@ -49,8 +56,10 @@ class Controller {
             return;
         }
         // Display the statistics
-        const statsTxt = `Number of Students: ${this.gradesData.numStudents} Highest: ${this.gradesData.highest} Lowest: ${this.gradesData.lowest} Average: ${this.gradesData.average}`
-        document.getElementById("output").innerHTML = statsTxt;
+        this.averageTd.innerHTML = this.gradesData.average;
+        this.highestTd.innerHTML = this.gradesData.highest;
+        this.lowestTd.innerHTML = this.gradesData.lowest;
+        this.studentCountTd.innerHTML = this.gradesData.numStudents;
         // Otherwise proceed to create a plot
         this.gradesPlot = new GradesPlot(this.plotDivElement, this.gradesData, this.courseTitleInput.value);
         // Enable the slider controls
@@ -75,8 +84,9 @@ class Controller {
             this.sliders[i].addEventListener("input", function () { _this.updateGradeCutOffs(i) });
             this.spinners[i].addEventListener("change", function () { _this.updateGradeCutOffs(i) });
         }
-        // Enable the save PDF button
-        this.saveButton.disabled = false;
+        // Enable the save PDF and save Grades buttons
+        this.savePDFButton.disabled = false;
+        this.saveGradesButton.disabled = false;
     }
 
     // Call-back function for change in slider/spinner/checkbox value 
@@ -120,7 +130,7 @@ class Controller {
         doc.addImage(canvasImg, 'JPEG', leftMargin, yWrite, scaledImgWidth, scaledImgHeight);
 
         // Update the y position
-        yWrite = yWrite + scaledImgHeight + 20;
+        yWrite = yWrite + scaledImgHeight + 10;
 
         // Create a tabular data for printing to the PDF
         const tableBody = [];
@@ -145,9 +155,9 @@ class Controller {
 
         // Add some text
         doc.setFontSize(14);
+        doc.setTextColor("#211d70");
         doc.text("Grades Summary Table", Math.round(0.45 * scaledImgWidth), yWrite);
         doc.setFontSize(12);
-        doc.setTextColor(100);
 
         // Update the y position
         yWrite = yWrite + 5;
@@ -160,13 +170,13 @@ class Controller {
             headStyles: {
                 fontStyle: "bold",
                 halign: "center",
-                fillColor: "#c0737a",
+                fillColor: "#211d70",
                 textColor: "#ffffff",
                 lineWidth: 0.25,
-                lineColor: 20,
+                lineColor: "#211d70",
             },
             bodyStyles: {
-                lineColor: 20,
+                lineColor: "#211d70",
                 lineWidth: 0.25,
                 fillColor: "#ffffff",
             },
@@ -174,10 +184,45 @@ class Controller {
                 fillColor: "#f2f2f7",
             },
             tableWidth: Math.round(0.3 * scaledImgWidth),
-            margin: { left: Math.round(0.4 * scaledImgWidth)}
+            margin: { left: Math.round(0.4 * scaledImgWidth) }
         });
 
         doc.save('histogram.pdf');
+    }
+
+    // The save Grades button callback
+    saveGrades = () => {
+        const gradesArray = this.gradesData.gradesArray;
+        const scores = this.gradesData.scores;
+        var csv = 'Marks,Grade\n';
+        var upperLimit;
+        for (const score of scores) {
+            var currentGrade = -1;
+            upperLimit = this.gradesData.maxScore + 1;
+            for(const grade of gradesArray){
+                if (!grade.enabled) {
+                    continue;
+                }
+                if (score >= grade.cutOff && score < upperLimit){
+                    currentGrade = grade.label;
+                    upperLimit = grade.cutOff;
+                    break;
+                }
+            }
+            if (currentGrade != -1){
+                // We found a valid grade
+                csv += `${score},${currentGrade}\n`
+            }
+            else{
+                csv += `${score},NOT_FOUND\n`
+            }
+        }
+        console.log(csv);
+        var hiddenElement = document.createElement('a');
+        hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+        hiddenElement.target = '_blank';
+        hiddenElement.download = 'grades.csv';
+        hiddenElement.click();
     }
 }
 
@@ -251,16 +296,20 @@ class GradesData {
             histogram[score]++;
         }
         // Create the bin edges for plotting a histogram
-        let binEdges = [];
-        for (let i = 0; i <= maxScore + 1; i++) {
-            binEdges[i] = -0.5 + i;
+        let leftEdges = [];
+        let rightEdges = [];
+        let binValues = [];
+        for (let i = 0; i <= maxScore; i++) {
+            leftEdges[i] = -0.4 + i;
+            rightEdges[i] = 0.4 + i;
+            binValues[i] = i;
         }
         // Update the histogram data object based on the calculations
         this.histData = {
             top: histogram,
-            left: binEdges.slice(0, -1),
-            right: binEdges.slice(1),
-            binValue: binEdges.slice(0, -1).map(function (v) { return v + 0.5; })
+            left: leftEdges,
+            right: rightEdges,
+            binValue: binValues
         };
         // Now that initial cut-offs and the histogram bins are ready
         this.updateMGPA();
@@ -349,8 +398,9 @@ class GradesPlot {
         // Set the data source for the histogram quads
         const columnDataSource = new Bokeh.ColumnDataSource({ data: gradesData.histData });
 
-        // Set the y-axis maximum value
-        const ymax = Math.max(...gradesData.histData.top) + 4;
+        // Set the y-axis maximum value. We need some extra space for the label markers.
+        let ymax = Math.max(...gradesData.histData.top);
+        ymax = Math.round(1.25 * ymax);
 
         // Make the axis ranges
         const xdr = new Bokeh.Range1d({ start: -0.5, end: gradesData.maxScore + 1 });
@@ -361,8 +411,8 @@ class GradesPlot {
             sizing_mode: "scale_both",
             x_range: xdr,
             y_range: ydr,
-            background_fill_color: "#F2F2F7",
-            height: 170,
+            background_fill_color: "#e5e5e5",
+            height: 190,
         });
 
         // For easy referencing of the plot
@@ -384,26 +434,59 @@ class GradesPlot {
         this.plotTitle = new Bokeh.Title({
             text: `${title} MGPA: ${gradesData.mgpa}`,
             align: "center",
-            text_font_size: "3em"
+            text_font_size: "20pt",
+            text_color: "#211d70"
         });
         plot.add_layout(this.plotTitle, "above");
 
         // Set the axis labels
-        const xaxis = new Bokeh.LinearAxis({ axis_label: "Score", axis_label_text_font_size: "2em", major_label_text_font_size: "12pt" });
-        const yaxis = new Bokeh.LinearAxis({ axis_label: "Frequency", axis_label_text_font_size: "2em", major_label_text_font_size: "12pt" });
+        const xaxis = new Bokeh.LinearAxis({
+            axis_label: "Marks",
+            axis_label_text_color: "#211d70",
+            axis_label_text_font_style: "normal",
+            axis_label_text_font_size: "16pt",
+            major_label_text_font_size: "12pt",
+            major_label_text_color: "#211d70"
+        });
+        const yaxis = new Bokeh.LinearAxis({
+            axis_label: "Student Count",
+            axis_label_text_color: "#211d70",
+            axis_label_text_font_style: "normal",
+            axis_label_text_font_size: "16pt",
+            major_label_text_font_size: "12pt",
+            major_label_text_color: "#211d70"
+        });
         xaxis.ticker.desired_num_ticks = 20;
         plot.add_layout(xaxis, "below");
         plot.add_layout(yaxis, "left");
 
         // Add grids to the plot
-        const xgrid = new Bokeh.Grid({ ticker: xaxis.ticker, dimension: 0, grid_line_color: '#d8dcd6' });
-        const ygrid = new Bokeh.Grid({ ticker: yaxis.ticker, dimension: 1, grid_line_color: '#d8dcd6' });
+        const xgrid = new Bokeh.Grid({ ticker: xaxis.ticker, dimension: 0, grid_line_color: '#ffffff' });
+        const ygrid = new Bokeh.Grid({ ticker: yaxis.ticker, dimension: 1, grid_line_color: '#ffffff' });
         plot.add_layout(xgrid);
         plot.add_layout(ygrid);
 
         // Make the histogram
-        const quad = new Bokeh.Quad({ left: { "field": "left" }, right: { "field": "right" }, top: { "field": "top" }, bottom: 0, line_color: 'black', fill_color: "#c0737a" });
+        const quad = new Bokeh.Quad({
+            left: { "field": "left" },
+            right: { "field": "right" },
+            top: { "field": "top" },
+            bottom: 0,
+            //fill_color: "#e24a33",
+            fill_color: "#988ed5",
+            line_color: "#e5e5e5"
+        });
         plot.add_glyph(quad, columnDataSource);
+
+        // The average marker
+        const averageMarker = new Bokeh.Span({
+            location: gradesData.average,
+            dimension: "height",
+            line_color: "#211d70",
+            line_dash: "dashed",
+            line_width: 1
+        });
+        plot.add_layout(averageMarker);
 
         // Create a Span for each grade
         const gradesArray = gradesData.gradesArray;
@@ -412,20 +495,22 @@ class GradesPlot {
         for (let i = 0; i < gradesArray.length; i++) {
             // Create a vertical line for the grade
             this.spans[i] = new Bokeh.Span({
-                location: gradesArray[i].cutOff - 0.5,
+                location: gradesArray[i].cutOff - 0.4,
                 dimension: "height",
-                line_color: "#410200",
-                line_width: 3
+                line_color: "#211d70",
+                line_width: 2
             });
             plot.add_layout(this.spans[i]);
             // Create a label for the grade
             this.labels[i] = new Bokeh.Label({
-                x: gradesArray[i].cutOff - 0.5,
-                y: ymax - 2 - i % 2,
+                x: gradesArray[i].cutOff - 0.4,
+                y: (0.8 - (i % 2) * 0.1) * ymax,
+                y_units: "data",
                 text: `${gradesArray[i].label}: ${gradesArray[i].count}`,
                 border_line_color: "black",
                 background_fill_color: "wheat",
                 text_font_size: "16pt",
+                text_color: "#211d70"
             });
             plot.add_layout(this.labels[i]);
             // Set the visibility of the spans and labels
@@ -433,20 +518,11 @@ class GradesPlot {
             this.labels[i].visible = gradesArray[i].enabled;
         }
 
-        // The average marker
-        const averageMarker = new Bokeh.Span({
-            location: gradesData.average,
-            dimension: "height",
-            line_color: "red",
-            line_dash: "dashed",
-            line_width: 3
-        });
-        plot.add_layout(averageMarker);
-
         // Create a Label for each grade
         const avgLabel = new Bokeh.Label({
             x: gradesData.average,
-            y: ymax - 1,
+            y: 0.9 * ymax,
+            y_units: "data",
             text: `Avg: ${gradesData.average}`,
             text_font_size: "16pt",
             text_color: "red",
@@ -467,10 +543,10 @@ class GradesPlot {
         const gradesArray = gradesData.gradesArray;
         for (let i = 0; i < gradesArray.length; i++) {
             // Update the spans
-            this.spans[i].location = gradesArray[i].cutOff - 0.5;
+            this.spans[i].location = gradesArray[i].cutOff - 0.4;
             this.spans[i].visible = gradesArray[i].enabled;
             // Update the labels
-            this.labels[i].x = gradesArray[i].cutOff - 0.5;
+            this.labels[i].x = gradesArray[i].cutOff - 0.4;
             this.labels[i].visible = gradesArray[i].enabled;
             this.labels[i].text = `${gradesArray[i].label}: ${gradesArray[i].count}`;
         }
