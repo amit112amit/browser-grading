@@ -44,7 +44,7 @@ h1 {
 }
 .flexBox1 textarea {
   width: 450px;
-  height: 100px;
+  height: 75px;
   margin: 10px;
   resize: vertical;
 }
@@ -103,11 +103,6 @@ input[type="number"] {
   height: 30px;
 }
 
-/* The spacer for the title */
-.spacer {
-  display: none;
-}
-
 /* The styling for the footer */
 footer {
   display: flex;
@@ -117,9 +112,48 @@ footer {
   flex-wrap: wrap;
 }
 
-/* The address element style */
-address {
-  padding: 20px;
+/* The help button */
+#helpButton {
+  width: 150px;
+  height: 50px;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 14pt;
+  font-weight: bold;
+  cursor: pointer;
+  color: #211d70;
+  border-color: #211d70;
+}
+
+/* The overlay div */
+#overlay {
+  position: fixed;
+  display: none;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 2;
+  cursor: pointer;
+  color: white;
+  overflow: auto;
+}
+
+#overlay p {
+  font-size: 32pt;
+  text-align: center;
+}
+
+#overlay ul{
+  font-size: 20pt;
+}
+
+#overlay li{
+  padding: 10px;
 }
 
 /* Responsive layout - when the screen is more than 768px wide */
@@ -134,9 +168,5 @@ address {
   }
   .flexBox1 label {
     text-align: right;
-  }
-  .spacer {
-    display: block;
-    width: 25vw;
   }
 }

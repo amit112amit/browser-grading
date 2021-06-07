@@ -23,13 +23,11 @@
       crossorigin="anonymous"
     ></script>
 
-    <!-- <script type="text/javascript" defer="defer" src="https://cdn.jsdelivr.net/gh/amit112amit/browser-grading@2.1.0/gradinglogic.min.js" ></script> -->
-
+    <!-- The main javascript for the page -->
     <script type="text/javascript" src="gradinglogic.js" defer="defer"></script>
 
     <!-- The style sheet -->
     <link rel="stylesheet" href="gradingapp.css" />
-
   </head>
   <body>
     <!-- The header with logo -->
@@ -87,8 +85,8 @@
         <tr>
           <td id="tdStudentCount">0</td>
           <td id="tdHighest">0</td>
-          <td id="tdLowest">0</td>
           <td id="tdAverage">0</td>
+          <td id="tdLowest">0</td>
         </tr>
       </table>
     </div>
@@ -154,11 +152,98 @@
     <footer>
       <div class="flexBox2">
         <img alt="ColorBand" src="img/ColorBand.png" width="559" height="6" />
-        <address>
-          Report problems to amit.singh@pilani.bits-pilani.ac.in
-        </address>
+        <button
+          id="helpButton"
+          title="Click here for user guide"
+          type="button"
+          onclick="turnOnHelp()"
+        >
+          Need help?
+        </button>
       </div>
       <img alt="Motto" src="img/Motto.png" width="274" height="89" />
     </footer>
+
+    <!-- The user guide overlay -->
+    <div id="overlay" onclick="turnOffHelp()">
+      <p>Click anywhere to go back.</p>
+      <ul>
+        <li>
+          For best experience, open this page on a large screen device like a
+          laptop or a tablet.
+        </li>
+        <li>
+          To begin, enter a list of marks in the "Enter Marks" text area. For
+          example, you may copy and paste a column or a row from a spreadsheet
+          into the text area.
+        </li>
+        <li>
+          Click the "Plot Histogram" button. Some of the buttons and the grade
+          settings will remain disabled until a valid marks data is entered and
+          a histogram is plotted.
+        </li>
+        <li>
+					Verify the number of students, the highest, lowest and the average
+					marks displayed in the table below the "Plot Histogram" button. All
+					the scores are rounded-up before calculating the statistics.
+        </li>
+        <li>
+          Enter the course code and title. This will be used as the title of the
+          histogram plot and also for the downloaded PDF file.
+        </li>
+        <li>
+          Enter the course total. This is the maximum possible marks for the
+          course. It sets the x-axis limit of the histogram plot. On the
+          top-right of the plot, there is a toolbar with buttons to pan, zoom
+          and reset the plot view.
+        </li>
+        <li>
+          Hover over any of the bars in the histogram to see the marks and the
+          number of student who got that marks as a tooltip.
+        </li>
+        <li>
+          Enable or disable various grades using the checkboxes at the bottom of
+          the page. When a grade is unchecked, the corresponding slider and text
+          box are also disabled.
+        </li>
+        <li>
+          Adjust the cut-off for the grades using the corresponding slider. For
+          fine-grained control on the slider, click it and then
+          <b>use the keyboard arrow keys </b> to move it. It is also possible to
+          directly type the cut-off in the text box next to the slider. There
+          are up and down arrows on the text box to increment or decrement the
+          cut-off by 1.
+        </li>
+        <li>
+          The MGPA of the course is dynamically updated in the title of the plot
+          as the grade cut-offs are varied.
+        </li>
+        <li>
+          Once you are satisfied with the grade cut-offs, you can click the
+          "Save PDF" button to download a PDF file containing the histogram and
+          a summary table showing the grade boundaries and the number of
+          students in each grade.
+        </li>
+        <li>
+          You can also click "Save Grades" button to download a CSV file
+          containing the letter grades for each marks that you entered in the
+          text area in the same sequence.
+        </li>
+        <li>
+          For any bugs or usability issues please contact
+          <em>amit.singh@pilani.bits-pilani.ac.in</em>
+        </li>
+      </ul>
+    </div>
+
+    <!-- The small script for showing help -->
+    <script>
+      function turnOnHelp() {
+        document.getElementById("overlay").style.display = "block";
+      }
+      function turnOffHelp() {
+        document.getElementById("overlay").style.display = "none";
+      }
+    </script>
   </body>
 </html>
