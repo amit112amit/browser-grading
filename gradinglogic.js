@@ -145,7 +145,6 @@ class Controller {
         const scaledImgWidth = 277;
         const scaledImgHeight = Math.round(scaledImgWidth * imgHeight / imgWidth);
         const leftMargin = 10;
-        //const topmargin = Math.round(0.5 * (210 - 2 * leftmargin - outheight));
         const topMargin = 15;
 
         // Set the y-coordinate for next PDF element.
@@ -281,15 +280,17 @@ class GradesData {
         this.average = 0.0;
         this.highest = -1;
         this.lowest = 999;
+				//Populate the global array with rounded marks
         for (let i = 0; i < scores.length; i++) {
-            //Populate the global array with rounded marks
-            if (scores[i] > this.highest) {
-                this.highest = scores[i];
+						// Round up the score
+					  const score = Math.ceil(scores[i]);
+            if (score > this.highest) {
+                this.highest = score;
             }
-            if (scores[i] < this.lowest) {
-                this.lowest = scores[i];
+            if (score < this.lowest) {
+                this.lowest = score;
             }
-            this.average = this.average + scores[i];
+            this.average = this.average + score;
         }
         this.average = Math.round(this.average / scores.length);
         // Check for consistency of the data
