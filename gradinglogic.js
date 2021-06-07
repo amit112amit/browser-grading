@@ -18,7 +18,32 @@ class Controller {
             this.checkboxes[i].disabled = true;
             this.sliders[i].disabled = true;
             this.spinners[i].disabled = true;
+            // Assign the basic callback for the checkbox
+            const _this = this;
+            this.checkboxes[i].addEventListener("click", function () {
+                if (_this.checkboxes[i].checked) {
+                    _this.sliders[i].disabled = false;
+                    _this.spinners[i].disabled = false;
+                } else {
+                    _this.sliders[i].disabled = true;
+                    _this.spinners[i].disabled = true;
+                }
+            });
+            // Assign the callback for the slider
+            this.sliders[i].addEventListener("input", function () {
+              _this.spinners[i].value = _this.sliders[i].value;
+            });
+            // Assign the callback for the spinner
+            this.spinners[i].addEventListener("input", function () {
+              _this.sliders[i].value = _this.spinners[i].value;
+            });
         }
+        // Uncheck the minus grades and the E grade in the beginning
+        document.getElementById("amCheck").checked = false;
+        document.getElementById("bmCheck").checked = false;
+        document.getElementById("cmCheck").checked = false;
+        document.getElementById("eCheck").checked = false;
+
         // The output area for showing statistics
         this.averageTd = document.getElementById("tdAverage");
         this.highestTd = document.getElementById("tdHighest");
@@ -199,21 +224,21 @@ class Controller {
         for (const score of scores) {
             var currentGrade = -1;
             upperLimit = this.gradesData.maxScore + 1;
-            for(const grade of gradesArray){
+            for (const grade of gradesArray) {
                 if (!grade.enabled) {
                     continue;
                 }
-                if (score >= grade.cutOff && score < upperLimit){
+                if (score >= grade.cutOff && score < upperLimit) {
                     currentGrade = grade.label;
                     upperLimit = grade.cutOff;
                     break;
                 }
             }
-            if (currentGrade != -1){
+            if (currentGrade != -1) {
                 // We found a valid grade
                 csv += `${score},${currentGrade}\n`
             }
-            else{
+            else {
                 csv += `${score},NOT_FOUND\n`
             }
         }
@@ -408,11 +433,10 @@ class GradesPlot {
 
         // Make the figure
         this.plot = new Bokeh.Plot({
-            sizing_mode: "scale_both",
+            sizing_mode: "stretch_both",
             x_range: xdr,
             y_range: ydr,
             background_fill_color: "#e5e5e5",
-            height: 190,
         });
 
         // For easy referencing of the plot
