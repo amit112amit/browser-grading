@@ -80,6 +80,15 @@ class Controller {
             }
             return;
         }
+
+        // Check that course total is not empty or an invalid number
+        var numbers = /^[0-9\.]+$/;
+        if(!this.maxScoreInput.value.match(numbers)){
+            alert("Please enter a valid course total.");
+            this.maxScoreInput.focus();
+            return;
+        }
+
         // Display the statistics
         this.averageTd.innerHTML = this.gradesData.average;
         this.highestTd.innerHTML = this.gradesData.highest;
@@ -426,7 +435,7 @@ class GradesPlot {
 
         // Set the y-axis maximum value. We need some extra space for the label markers.
         let ymax = Math.max(...gradesData.histData.top);
-        ymax = Math.round(1.25 * ymax);
+        ymax = Math.ceil(1.25 * ymax);
 
         // Make the axis ranges
         const xdr = new Bokeh.Range1d({ start: -0.5, end: gradesData.maxScore + 1 });

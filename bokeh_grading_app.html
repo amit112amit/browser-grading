@@ -34,12 +34,22 @@
     <header>
       <img
         alt="BITS Logo"
-        src="img/BITS_university_logo.gif"
+        src="img/BITS_Pilani_campus_logo.gif"
         width="401"
         height="104"
       />
       <h1>Interactive Grading</h1>
-      <img alt="ColorBand" src="img/ColorBand.png" width="559" height="6" />
+      <div class="flexBox2">
+        <button
+          class="helpButton"
+          title="Click here for user guide"
+          type="button"
+          onclick="turnOnHelp()"
+        >
+          User Guide
+        </button>
+        <img alt="ColorBand" src="img/ColorBand.png" width="559" height="6" />
+      </div>
     </header>
 
     <!-- The input fields and the buttons -->
@@ -48,7 +58,7 @@
         <div class="flexBox2">
           <div class="flexBox1">
             <label for="courseTitleInput"><b>Couse Title:</b></label>
-            <input type="text" id="courseTitleInput" value="BITS F123 XYZ" />
+            <input type="text" id="courseTitleInput" />
           </div>
           <div class="flexBox1">
             <label for="courseTotalInput"><b>Couse Total:</b></label>
@@ -153,12 +163,12 @@
       <div class="flexBox2">
         <img alt="ColorBand" src="img/ColorBand.png" width="559" height="6" />
         <button
-          id="helpButton"
+          class="helpButton"
           title="Click here for user guide"
           type="button"
           onclick="turnOnHelp()"
         >
-          Need help?
+          User Guide
         </button>
       </div>
       <img alt="Motto" src="img/Motto.png" width="274" height="89" />
@@ -167,11 +177,19 @@
     <!-- The user guide overlay -->
     <div id="overlay" onclick="turnOffHelp()">
       <p>Click anywhere to go back.</p>
-      <ul>
+      <ol>
         <li>
           For best experience, open this page on a large screen device like a
           laptop or a tablet.
         </li>
+				<li>
+					This website does not store any data. Grades need to be submitted
+					separately through ERP.
+				</li>
+				<li>
+					Please verify the histogram generated and the grades calculated
+					before uploading on the ERP.
+				</li>
         <li>
           To begin, enter a list of marks in the "Enter Marks" text area. For
           example, you may copy and paste a column or a row from a spreadsheet
@@ -230,10 +248,9 @@
           text area in the same sequence.
         </li>
         <li>
-          For any bugs or usability issues please contact
-          <em>amit.singh@pilani.bits-pilani.ac.in</em>
+          For any bugs or usability issues please contact AUGSD.
         </li>
-      </ul>
+      </ol>
     </div>
 
     <!-- The small script for showing help -->
